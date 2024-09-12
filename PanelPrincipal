@@ -1,0 +1,169 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+public class biblioteca extends JFrame implements ActionListener {
+    private JTextField txtTitulo;
+    private JTextField txtAutor;
+    private JTextArea txtAreaResultados;
+    private List<Libro> libros;
+
+    public biblioteca() {
+        super("Biblioteca");
+
+        libros = new ArrayList<>();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(600, 400);
+        setLayout(new BorderLayout());
+        setResizable(false);
+        setLocationRelativeTo(null);
+
+        JPanel panelFormulario = new JPanel(new GridLayout(3, 2, 10, 10));
+        panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
+
+        JLabel lblTitulo = new JLabel("Título: ");
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        txtTitulo = new JTextField();
+        txtTitulo.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        JLabel lblAutor = new JLabel("Autor: ");
+        lblAutor.setFont(new Font("Arial", Font.BOLD, 16));
+        txtAutor = new JTextField();
+        txtAutor.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        panelFormulario.add(lblTitulo);
+        panelFormulario.add(txtTitulo);
+        panelFormulario.add(lblAutor);
+        panelFormulario.add(txtAutor);
+
+        JButton btnAgregar = new JButton("Agregar");
+        btnAgregar.addActionListener(this);
+        btnAgregar.setFont(new Font("Arial", Font.BOLD, 16));
+        btnAgregar.setBackground(new Color(0, 153, 51));
+        btnAgregar.setForeground(Color.white);
+        btnAgregar.setPreferredSize(new Dimension(200, 40));
+
+        JButton btnEliminar = new JButton("Eliminar");
+        btnEliminar.addActionListener(this);
+        btnEliminar.setFont(new Font("Arial", Font.BOLD, 16));
+        btnEliminar.setBackground(new Color(204, 0, 0));
+        btnEliminar.setForeground(Color.white);
+        btnEliminar.setPreferredSize(new Dimension(200, 40));
+
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.addActionListener(this);
+        btnBuscar.setFont(new Font("Arial", Font.BOLD, 16));
+        btnBuscar.setBackground(new Color(205, 153, 0));
+        btnBuscar.setForeground(Color.white);
+        btnBuscar.setPreferredSize(new Dimension(200, 40));
+
+        JButton btnInventario = new JButton("Inventario");
+        btnInventario.addActionListener(this);
+        btnInventario.setFont(new Font("Arial", Font.BOLD, 16));
+        btnInventario.setBackground(new Color(0, 0, 207));
+        btnInventario.setForeground(Color.white);
+        btnInventario.setPreferredSize(new Dimension(200, 40));
+
+        panelFormulario.add(btnAgregar);
+        panelFormulario.add(btnBuscar);
+        panelFormulario.add(btnEliminar);
+        panelFormulario.add(btnInventario);
+
+        txtAreaResultados = new JTextArea();
+        txtAreaResultados.setEditable(false);
+        txtAreaResultados.setFont(new Font("Arial", Font.PLAIN, 16));
+        txtAreaResultados.setLineWrap(true);
+        txtAreaResultados.setWrapStyleWord(true);
+        txtAreaResultados.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JScrollPane scrollPane = new JScrollPane(txtAreaResultados);
+        scrollPane.setPreferredSize(new Dimension(560, 200));
+
+        JPanel panelPrincipal = new JPanel(new BorderLayout());
+        panelPrincipal.add(panelFormulario, BorderLayout.NORTH);
+        panelPrincipal.add(scrollPane, BorderLayout.CENTER);
+        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        add(panelPrincipal);
+        setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("Agregar")) {
+            String titulo = txtTitulo.getText().trim();
+            String autor = txtAutor.getText().trim();
+            if (!titulo.isEmpty() && !autor.isEmpty()) {
+                libros.add(new Libro(titulo, autor));
+                txtTitulo.setText("");
+                txtAutor.setText("");
+                txtAreaResultados.setText("Libro agregado correctamente");
+            } else {
+                txtAreaResultados.setText("Debe ingresar título y autor");
+            }
+        } else if (e.getActionCommand().equals("Eliminar")) {
+            String titulo = txtTitulo.getText().trim();
+            if (!titulo.isEmpty()) {
+                for (int i = 0; i < libros.size(); i++) {
+                    if (libros.get(i).getTitulo().equalsIgnoreCase(titulo)) {
+                        libros.remove(i);
+                        txtTitulo.setText("");
+                        txtAutor.setText("");
+                        txtAreaResultados.setText("Libro eliminado correctamente");
+                        return;
+                    }
+                }
+                txtAreaResultados.setText("No se encontró el libro con ese título");
+            } else {
+                txtAreaResultados.setText("Debe ingresar el título del libro a eliminar");
+            }
+        } else if (e.getActionCommand().equals("Buscar")) {
+            String titulo = txtTitulo.getText().trim();
+            if (!titulo.isEmpty()) {
+                for (Libro libro : libros) {
+                    if (libro.getTitulo().equalsIgnoreCase(titulo)) {
+                        txtAreaResultados.setText("Título: " + libro.getTitulo() + "\nAutor: " + libro.getAutor());
+                        return;
+                    }
+                }
+                txtAreaResultados.setText("No se encontró el libro con ese título");
+            } else {
+                txtAreaResultados.setText("Debe ingresar el título del libro a buscar");
+            }
+        } else if (e.getActionCommand().equals("Inventario")) {
+            if (!libros.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (Libro libro : libros) {
+                    sb.append("Título: ").append(libro.getTitulo()).append("\nAutor: ").append(libro.getAutor()).append("\n\n");
+                }
+                txtAreaResultados.setText(sb.toString());
+            } else {
+                txtAreaResultados.setText("No hay libros en el inventario");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new biblioteca());
+    }
+}
+
+class Libro {
+    private String titulo;
+    private String autor;
+
+    public Libro(String titulo, String autor) {
+        this.titulo = titulo;
+        this.autor = autor;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getAutor() {
+        return autor;
+    }
+}
